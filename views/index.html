@@ -2,8 +2,21 @@
 <html>
 <head>
 	<title>URL Shortener Microservice</title>
+
+	<link rel="stylesheet" type="text/css" href="/static/css/app.css">
 </head>
 <body>
+
+	<h1>URL Shortener Microservice</h1>
+
+	<form method="POST" action="/api/shorturl/new">
+		<input type="url" name="url" value="https://" required> 
+		<input type="submit" value="Shorten">
+	</form>
+
+	<div id="short-url-container">
+		Shortened URL: <a id="short-url"></a>
+	</div>
 
 	<script type="text/javascript" src="/static/js/app.js"></script>
 </body>

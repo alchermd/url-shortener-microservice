@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -23,8 +24,10 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.Header().Add("Allow-Access-Control-Origin", "*")
 
+	payload := getPayload(r)
+
 	url := &ShortUrl{
-		OriginalUrl: "https://example.com/",
+		OriginalUrl: payload["url"],
 		ShortUrl:    1,
 	}
 
@@ -36,6 +39,14 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, string(j))
+}
+
+func getPayload(r *http.Request) map[string]string {
+	body := make(map[string]string)
+	b, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(b, &body)
+
+	return body
 }
 
 func redirectHandler(w http.ResponseWriter, r *http.Request) {
