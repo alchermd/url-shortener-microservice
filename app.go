@@ -38,6 +38,15 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(j))
 }
 
+func redirectHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	w.Header().Add("Allow-Access-Control-Origin", "*")
+
+	id := r.URL.Path[len("/api/shorturl/"):]
+
+	fmt.Fprintf(w, `{"message": "hello, %s"}`, id)
+}
+
 func main() {
 	port := os.Getenv("PORT")
 
@@ -47,6 +56,7 @@ func main() {
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/api/shorturl/new", shortenerHandler)
+	http.HandleFunc("/api/shorturl/", redirectHandler)
 
 	log.Print("Serving assets on /static/")
 	fs := http.FileServer(http.Dir("assets/"))
