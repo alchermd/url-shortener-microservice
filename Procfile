@@ -1,1 +1,1 @@
-web:bin/url-shortener-microservice
+web: bin/url-shortener-microservice
