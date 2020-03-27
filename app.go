@@ -29,10 +29,44 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	payload := getPayload(r)
 
-	s, err := http.Head(payload["url"])
+	_, err := http.Head(payload["url"])
 
 	if err != nil {
 		http.Error(w, `{"error": "invalid URL"}`, http.StatusNotFound)
+		return
+	}
+
+	rows, err := db.Query(`SELECT original_url, id FROM urls WHERE original_url=? LIMIT 1`, payload["url"])
+	defer rows.Close()
+
+	if err != nil {
+		log.Fatal(err)
+		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
+		return
+	}
+
+	var (
+		originalUrl string
+		id          int64
+	)
+
+	rows.Next()
+	rows.Scan(&originalUrl, &id)
+
+	if id != 0 {
+		url := &ShortUrl{
+			OriginalUrl: originalUrl,
+			ShortUrl:    id,
+		}
+
+		j, err := json.Marshal(url)
+
+		if err != nil {
+			http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
+			return
+		}
+
+		fmt.Fprintf(w, string(j))
 		return
 	}
 
