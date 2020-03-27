@@ -32,6 +32,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	_, err := http.Head(payload["url"])
 
 	if err != nil {
+		log.Print(err)
 		http.Error(w, `{"error": "invalid URL"}`, http.StatusNotFound)
 		return
 	}
@@ -40,7 +41,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	defer rows.Close()
 
 	if err != nil {
-		log.Fatal(err)
+		log.Print(err)
 		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 		return
 	}
@@ -62,6 +63,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 		j, err := json.Marshal(url)
 
 		if err != nil {
+			log.Print(err)
 			http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 			return
 		}
@@ -73,6 +75,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	result, err := db.Exec("INSERT INTO urls(original_url) VALUES(?)", payload["url"])
 
 	if err != nil {
+		log.Print(err)
 		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 		return
 	}
@@ -80,6 +83,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	shortUrl, err := result.LastInsertId()
 
 	if err != nil {
+		log.Print(err)
 		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 		return
 	}
@@ -92,6 +96,7 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	j, err := json.Marshal(url)
 
 	if err != nil {
+		log.Print(err)
 		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 		return
 	}
@@ -113,6 +118,7 @@ func redirectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 	err = rows.Scan(&redirectUrl)
 
 	if err != nil {
+		log.Print(err)
 		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
 		return
 	}
