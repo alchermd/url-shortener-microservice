@@ -64,7 +64,19 @@ func redirectHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	id := r.URL.Path[len("/api/shorturl/"):]
 
-	fmt.Fprintf(w, `{"message": "hello, %s"}`, id)
+	rows, err := db.Query("SELECT original_url FROM urls WHERE id=? LIMIT 1", id)
+	defer rows.Close()
+
+	var redirectUrl string
+	rows.Next()
+	err = rows.Scan(&redirectUrl)
+
+	if err != nil {
+		http.Error(w, `{"message": "Something went wrong"}`, http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, redirectUrl, http.StatusMovedPermanently)
 }
 
 func getPayload(r *http.Request) map[string]string {
