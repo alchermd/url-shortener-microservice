@@ -29,6 +29,13 @@ func shortenerHandler(w http.ResponseWriter, r *http.Request, db *sql.DB) {
 
 	payload := getPayload(r)
 
+	s, err := http.Head(payload["url"])
+
+	if err != nil {
+		http.Error(w, `{"error": "invalid URL"}`, http.StatusNotFound)
+		return
+	}
+
 	result, err := db.Exec("INSERT INTO urls(original_url) VALUES(?)", payload["url"])
 
 	if err != nil {

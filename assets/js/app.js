@@ -13,6 +13,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
 	})
 	.then(res => res.json())
 	.then(data => {
+		if (data.error) {
+			alert("Invalid URL");
+			return;
+		}
+
 		document.querySelector("#short-url-container").style.display = "block";
 
 		const shortUrl = `/api/shorturl/${data.short_url}`;
